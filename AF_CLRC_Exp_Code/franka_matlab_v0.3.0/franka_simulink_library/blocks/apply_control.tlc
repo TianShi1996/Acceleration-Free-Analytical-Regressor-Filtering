@@ -1,0 +1,104 @@
+%%  Copyright (c) 2020 Franka Emika GmbH - All Rights Reserved
+%%  This file is subject to the terms and conditions defined in the file
+%%  'LICENSE' , which is part of this package
+
+%implements "apply_control" "C"
+
+%function BlockTypeSetup(block, system) void
+  %<LibAddToCommonIncludes("control_modes.h")>
+  %<LibAddToCommonIncludes("gripper_api.h")>
+%endfunction
+
+%% Function: BlockInstanceData ===============================
+%% Abstract:
+%function BlockInstanceData(block, system) Output
+{
+    %openfile buffer
+        SimulinkPandaRobot simulinkPandaRobot_%<SFcnParamSettings.robot_id>;
+        %if SFcnParamSettings.gripper_attached == 1
+        std::unique_ptr<SimulinkPandaGripper> simulinkPandaGripper_%<SFcnParamSettings.robot_id>;
+        %endif
+    %closefile buffer
+    %<LibCacheGlobalPrmData(buffer)>
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id> = SimulinkPandaRobot(   "%<SFcnParamSettings.robot_ip>",
+                                                                              %<SFcnParamSettings.gripper_attached>,
+                                                                              %<SFcnParamSettings.control_mode>,
+                                                                              %<SFcnParamSettings.controller_choice>,
+                                                                              %<LibBlockParameterAddr(collision_thresholds, "", "", 0)>,
+                                                                              %<LibBlockParameterAddr(joint_impedance, "", "", 0)>,
+                                                                              %<LibBlockParameterAddr(cartesian_impedance, "", "", 0)>,
+                                                                              %<LibBlockParameterAddr(load_inertia, "", "", 0)>,
+                                                                              %<LibBlockParameterAddr(EE_T_K, "", "", 0)>,
+                                                                              %<SFcnParamSettings.init_joint_configuration_req>,
+                                                                              %<LibBlockParameterAddr(init_joint_configuration, "", "", 0)>,
+                                                                              %<SFcnParamSettings.elbow_control>);
+    %if SFcnParamSettings.gripper_attached == 1
+    simulinkPandaGripper_%<SFcnParamSettings.robot_id> = std::make_unique<SimulinkPandaGripper>("%<SFcnParamSettings.robot_ip>");
+    %endif
+}
+%endfunction %% BlockTypeSetup
+
+%% Function: Start ========================================================
+%% Abstract:
+%% Initialization code
+%function Start(block, system) Output
+{
+  //Flag for performing initialization in first run of main _step();
+  %<LibBlockDWork(DWORK1, "", "", 0)> = 0;
+  %<LibBlockDWork(DWORK2, "", "", 0)> = (double)simulinkPandaRobot_%<SFcnParamSettings.robot_id>.establishIfCurrentBlockFirstToBeComputed();
+} 
+%endfunction
+
+%% Function: Outputs ========================================================
+%% Abstract:
+%% Implement main code in C++
+%function Outputs(block, system) Output
+{
+    /* %<Type> Block: %<Name> */
+    
+     if ((bool)%<LibBlockDWork(DWORK1, "", "", 0)>) {
+    
+        // Wait for the control thread signal
+        if ((bool)%<LibBlockDWork(DWORK2, "", "", 0)>) {
+            simulinkPandaRobot_%<SFcnParamSettings.robot_id>.waitForControlThreadStep();}
+
+        // If control loop threw exeption terminate execution
+        simulinkPandaRobot_%<SFcnParamSettings.robot_id>.checkIfAndHandleException();
+
+        // copy inputs
+        %if SFcnParamSettings.gripper_attached == 1
+        simulinkPandaGripper_%<SFcnParamSettings.robot_id>->parseGripperCommand(%<LibBlockInputSignalAddr(0,"", "", 0)>);
+        simulinkPandaGripper_%<SFcnParamSettings.robot_id>->applyGripperCommand();
+        %endif
+
+        %foreach portIdx = NumDataInputPorts
+        %if SFcnParamSettings.gripper_attached == 1 && portIdx == 0
+        %else 
+            simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyInputSignal(%<LibBlockInputSignalAddr(portIdx,"", "", 0)>, %<portIdx>);
+        %endif
+        %endforeach
+
+        // notify control thread that the inputs have been read
+        simulinkPandaRobot_%<SFcnParamSettings.robot_id>.notifyControlThreadToContinue();
+
+    }else if (!(bool)%<LibBlockDWork(DWORK1, "", "", 0)>) {
+
+        // Its the first time _step() function is called --> 
+        // Initialize according to settings parsed from the mask
+        // and spawn control thread
+        simulinkPandaRobot_%<SFcnParamSettings.robot_id>.applyRobotSettings();
+        simulinkPandaRobot_%<SFcnParamSettings.robot_id>.spawnControlThread();
+
+        %<LibBlockDWork(DWORK1, "", "", 0)> = 1;
+   }
+}
+%endfunction
+
+%% Function: Terminate ========================================================
+%% Abstract:
+%% Finalization code
+%function Terminate(block, system) Output
+{
+/* %<Type> Block: %<Name> */
+}
+%endfunction

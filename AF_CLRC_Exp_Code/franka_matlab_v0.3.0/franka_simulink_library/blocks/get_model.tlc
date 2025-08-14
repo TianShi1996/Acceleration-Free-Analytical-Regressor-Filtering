@@ -1,0 +1,61 @@
+%%  Copyright (c) 2020 Franka Emika GmbH - All Rights Reserved
+%%  This file is subject to the terms and conditions defined in the file
+%%  'LICENSE' , which is part of this package
+
+%implements "get_model" "C"
+
+%function BlockTypeSetup(block, system) void
+  %<LibAddToCommonIncludes("robot_api.h")>
+  %<LibAddToCommonIncludes("franka/model.h")>
+%endfunction
+
+%% Function: Start ========================================================
+%% Abstract:
+%% Initialization code
+%function Start(block, system) Output
+{
+  %<LibBlockDWork(DWORK1, "", "", 0)> = (double)simulinkPandaRobot_%<SFcnParamSettings.robot_id>.establishIfCurrentBlockFirstToBeComputed();
+}
+%endfunction
+
+%% Function: Outputs ========================================================
+%% Abstract:
+%% Implement main code in C++
+%function Outputs(block, system) Output
+{
+  if (simulinkPandaRobot_%<SFcnParamSettings.robot_id>.getControlThreadHasBeenSpawned()) {
+    
+    // Wait for the control thread signal
+    if ((bool)%<LibBlockDWork(DWORK1, "", "", 0)>) {simulinkPandaRobot_%<SFcnParamSettings.robot_id>.waitForControlThreadStep();}
+
+    // If control loop threw exeption terminate execution
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.checkIfAndHandleException();
+
+    // robot pose
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyRobotPose(%<LibBlockOutputSignalAddr(0,"", "", 0)>);
+
+    // bodyJacobian
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyBodyJacobian(%<LibBlockOutputSignalAddr(1,"", "", 0)>);
+
+    // zeroJacobian
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyZeroJacobian(%<LibBlockOutputSignalAddr(2,"", "", 0)>);
+
+    // mass
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyMass(%<LibBlockOutputSignalAddr(3,"", "", 0)>);
+    
+    // coriolis
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyCoriolis(%<LibBlockOutputSignalAddr(4,"", "", 0)>);
+
+    // gravity
+    simulinkPandaRobot_%<SFcnParamSettings.robot_id>.copyGravity(%<LibBlockOutputSignalAddr(5,"", "", 0)>);
+
+  }
+}
+%endfunction
+
+%% Function: Terminate ========================================================
+%% Abstract:
+%% Finalization code
+%function Terminate(block, system) Output
+
+%endfunction

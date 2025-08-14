@@ -1,0 +1,75 @@
+%% SYSTLC: Generic Real-Time Target \
+%%    TMF: grt_default_tmf MAKE: make_rtw EXTMODE: ext_comm 
+%%
+%% 
+%% 
+%% 
+%%
+%% Copyright 1994-2016 The MathWorks, Inc.
+%% Copyright (c) 2021 Franka Emika GmbH - All Rights Reserved
+%% This file is subject to the terms and conditions defined in the file
+%% 'LICENSE' , which is part of this package
+%% Abstract: Generic real-time system target file.
+%%
+%selectfile NULL_FILE
+
+%assign TargetType = "RT"
+%assign Language   = "C"
+%assign GenRTModel = 1
+%assign _GRT_      = 0
+%assign TargetRegistMutexOp   = 1 
+%assign TargetRegistSynchroOp = 1
+
+%include "codegenentry.tlc"
+
+%include "franka_emika_panda_genfiles.tlc"
+
+/%
+  BEGIN_RTW_OPTIONS
+
+  oIdx = 1;
+
+  rtwoptions(oIdx).prompt         = 'Franka Emika Additional Options';
+  rtwoptions(oIdx).type           = 'Category';
+  rtwoptions(oIdx).enable         = 'on';  
+  rtwoptions(oIdx).default        = 1;   % number of items under this category
+                                      % excluding this one.
+  rtwoptions(oIdx).popupstrings  = '';
+  rtwoptions(oIdx).tlcvariable   = '';
+  rtwoptions(oIdx).tooltip       = '';
+  rtwoptions(oIdx).callback      = '';
+  rtwoptions(oIdx).opencallback  = '';
+  rtwoptions(oIdx).closecallback = '';
+  rtwoptions(oIdx).makevariable  = '';
+
+  oIdx = oIdx + 1;
+
+  rtwoptions(oIdx).prompt         = 'Run External Mode as a background thread';
+  rtwoptions(oIdx).type           = 'Checkbox';
+  rtwoptions(oIdx).default        = 'on';
+  rtwoptions(oIdx).tlcvariable    = 'ExtModeBackgroundThread';
+  rtwoptions(oIdx).callback       = 'franka_emika_select_callback_handler(hDlg, hSrc)';
+  rtwoptions(oIdx).tooltip        = sprintf([...
+    'Execute external mode as a background thread ',...
+    'in order to not disrupt the real time process ',...
+    '(especially recommended in the case of simple TCP/IP communication layer).']);
+
+  oIdx = oIdx + 1;
+
+  rtwoptions(oIdx).prompt         = 'RT Main path';
+  rtwoptions(oIdx).type           = 'NonUI';
+  rtwoptions(oIdx).default        = '';
+  rtwoptions(oIdx).tlcvariable    = 'RTMain';
+
+
+  %----------------------------------------%
+  % Configure code generation settings %
+  %----------------------------------------%
+  
+  rtwgensettings.DerivedFrom    = 'grt.tlc';
+  rtwgensettings.BuildDirSuffix = '_franka_emika_rtw';
+  rtwgensettings.Version        = '1'; % Specify callbacks' compliance with DAStudio dialog
+  rtwgensettings.SelectCallback = 'franka_emika_select_callback_handler(hDlg, hSrc)';
+  
+  END_RTW_OPTIONS 
+ %/

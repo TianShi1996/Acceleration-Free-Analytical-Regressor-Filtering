@@ -1,0 +1,12 @@
+%% Copyright (c) 2021 Franka Emika GmbH - All Rights Reserved
+%% This file is subject to the terms and conditions defined in the file
+%% 'LICENSE' , which is part of this package
+
+%if (ExtModeBackgroundThread == 1) && (ExtMode == 1)
+
+%openfile rt_main="rt_main.cpp"
+%selectfile rt_main
+%include RTMain
+%closefile rt_main
+
+%endif

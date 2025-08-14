@@ -1,0 +1,1 @@
+/usr/bin/c++  -O3 -DNDEBUG   CMakeFiles/vacuum_object.dir/vacuum_object.cpp.o  -o vacuum_object  -Wl,-rpath,/home/zyj/桌面/RCLRC_IEEE_Journal/Experiment_Code/utilization/franka_matlab_v0.3.0/libfranka/build: libexamples_common.a ../libfranka.so.0.9.0 
