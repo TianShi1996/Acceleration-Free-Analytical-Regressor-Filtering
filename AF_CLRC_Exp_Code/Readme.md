@@ -1,16 +1,15 @@
-/**************************************************************************
-****************************  Folder Description *************************************
-****The data in this folder is based on the implementation of the paper
-****Title: Acceleration-Free Analytical Regressor Filtering for Robot Online Identification and Control
-***********************************************************************************/
-
-/***Noting：Before running the experiment, you need to configure libfranka and Franka MATLAB ***/
-/***Dependency package download URL: https://frankaemika.github.io/docs/  ***/
-/***Experimental procedures: Adding all files and file folders to path, then  
-/***running Main.m and opening the simulink file exp_CLRC_AF.mdl ***/
+# Folder Description
+The data in this folder is based on the implementation of the paper
+Title: Acceleration-Free Analytical Regressor Filtering for Robot Online Identification and Control
 
 
-|Directory/File|              	|Description|
+Noting：Before running the experiment, you need to configure libfranka and Franka MATLAB
+Dependency package download URL: https://frankaemika.github.io/docs/
+Experimental procedures: Adding all files and file folders to path, then  
+running Main.m and opening the simulink file exp_CLRC_AF.mdl
+
+
+# |Directory/File|              	|Description|
 |-- Readme.txt		// readme file
 |-- AF_CLRC_Exp_Code		// 
 |-- |-- franka_matlab_v0.3.0   //  A library of dependencies necessary to run the experiment
