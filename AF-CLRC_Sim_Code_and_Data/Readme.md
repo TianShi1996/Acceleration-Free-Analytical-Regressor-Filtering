@@ -1,4 +1,4 @@
-#  Folder Description\
+#  Folder Description
 The data in this folder is based on the implementation of the paper\
 Title: Acceleration-Free Analytical Regressor Filtering for Robot Online Identification and Control\
 
@@ -10,7 +10,7 @@ Simulation procedures: Adding all files and file folders to path, then \
 Note that all results must be moved into sim_fig or simg_fig_DDF folder\
 
 
-# |Directory/File|              	|Description|\
+# |Directory/File|              	|Description|
 |-- Readme.txt		// readme file\
 |-- AF-CLRC_Sim_Code		// simulation folder\
 |-- |-- dynamic_model          //  dynamics model\
