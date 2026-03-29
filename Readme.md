@@ -14,4 +14,4 @@ AF-CLRC_Sim_Code_and_Data | Simmulation programs and results
 C++_simulations   |  C++ programs
 
 # Paper link
-https://ieeexplore.ieee.org/document/10778318
+https://doi.org/10.1109/tro.2026.3677083
